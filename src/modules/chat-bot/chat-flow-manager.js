@@ -1,12 +1,19 @@
 const { createBot } = require('../../utils/bot');
 const AppConfig = require('../../config/app');
-const { OpenAI } = require('openai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const ChatFlowManager = new (class ChatFlowManager {
 	constructor() {
 		this.bot = createBot(AppConfig.zaloBotToken);
-		this.client = new OpenAI({
-			apiKey: AppConfig.openAIApiKey,
+		this.client = new GoogleGenerativeAI(AppConfig.aiApiKey);
+		this.model = this.client.getGenerativeModel({
+			model: 'gemini-pro',
+			geminiConfig: {
+				temperature: 0.9,
+				topP: 1,
+				topK: 1,
+				maxOutputTokens: 4096,
+			},
 		});
 	}
 
@@ -15,13 +22,10 @@ const ChatFlowManager = new (class ChatFlowManager {
 			const chatId = msg.chat.id;
 			const text = msg.text.split(`@${AppConfig.zaloBotName} `)[1];
 			if (text && text.trim().length > 1) {
-				this.client.responses
-					.create({
-						model: 'gpt-5.4',
-						input: text,
-					})
+				this.model
+					.generateContent(text)
 					.then((resp) => {
-						this.bot.sendMessage(chatId, resp.output_text);
+						this.bot.sendMessage(chatId, resp.response.text());
 					})
 					.catch((err) => {
 						this.bot.sendMessage(

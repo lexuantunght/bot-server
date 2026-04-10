@@ -19,8 +19,8 @@ const AppConfig = new (class AppConfig {
 		return process.env.ZALO_BOT_NAME || '';
 	}
 
-	get openAIApiKey() {
-		return process.env.OPENAI_API_KEY;
+	get aiApiKey() {
+		return process.env.AI_API_KEY;
 	}
 })();
 
