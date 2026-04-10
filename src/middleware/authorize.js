@@ -1,0 +1,28 @@
+const AppConfig = require('../config/app');
+
+const verifyToken = async (req, res, next) => {
+	const authHeader = req.headers['Authorization'] || req.headers['X-Bot-Api-Secret-Token'];
+
+	if (!authHeader || !authHeader.startsWith('Bearer ')) {
+		return res.status(401).json({ error_code: 401, error_message: 'Unauthorized - No token provided' });
+	}
+
+	const idToken = authHeader.split('Bearer ')[1];
+
+	try {
+		switch (idToken) {
+			case AppConfig.zaloBotApiKey:
+				req.user = { uid: 'zalobot', displayName: 'Zalo Bot' };
+				break;
+			default:
+				throw Error('Unauthorized - Invalid token');
+		}
+		next();
+	} catch (error) {
+		return res.status(401).json({ error_code: 401, error_message: 'Unauthorized - Invalid token' });
+	}
+};
+
+module.exports = {
+	verifyToken,
+};

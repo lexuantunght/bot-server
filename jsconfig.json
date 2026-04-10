@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+		"target": "ES6",
+		"ignoreDeprecations": "6.0",
+		"useDefineForClassFields": true,
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"skipLibCheck": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"strict": true,
+		"forceConsistentCasingInFileNames": false,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"noEmit": true,
+		"rootDirs": ["src"]
+	},
+	"include": ["src"],
+	"exclude": ["node_modules", "**/node_modules/*"]
+}
