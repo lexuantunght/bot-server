@@ -13,7 +13,7 @@ const ChatFlowManager = new (class ChatFlowManager {
 	start() {
 		this.bot.on('message', (msg) => {
 			const chatId = msg.chat.id;
-			console.log('receive message'.JSON.stringify(msg));
+			console.log('receive message', JSON.stringify(msg));
 
 			this.client.responses
 				.create({
