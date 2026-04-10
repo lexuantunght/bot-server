@@ -1,20 +1,18 @@
 const { createBot } = require('../../utils/bot');
 const AppConfig = require('../../config/app');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenAI } = require('@google/genai');
 
-const ChatFlowManager = new (class ChatFlowManager {
+class ChatFlowManager {
+	static get shared() {
+		if (!this._instance) {
+			this._instance = new ChatFlowManager();
+		}
+		return this._instance;
+	}
+
 	constructor() {
 		this.bot = createBot(AppConfig.zaloBotToken);
-		this.client = new GoogleGenerativeAI(AppConfig.aiApiKey);
-		this.model = this.client.getGenerativeModel({
-			model: 'gemini-pro',
-			geminiConfig: {
-				temperature: 0.9,
-				topP: 1,
-				topK: 1,
-				maxOutputTokens: 4096,
-			},
-		});
+		this.client = new GoogleGenAI({ apiKey: AppConfig.aiApiKey });
 	}
 
 	start() {
@@ -22,10 +20,13 @@ const ChatFlowManager = new (class ChatFlowManager {
 			const chatId = msg.chat.id;
 			const text = msg.text.split(`@${AppConfig.zaloBotName} `)[1];
 			if (text && text.trim().length > 1) {
-				this.model
-					.generateContent(text)
+				this.client.models
+					.generateContent({
+						model: 'gemini-2.5-flash',
+						contents: text,
+					})
 					.then((resp) => {
-						this.bot.sendMessage(chatId, resp.response.text());
+						this.bot.sendMessage(chatId, resp.text);
 					})
 					.catch((err) => {
 						this.bot.sendMessage(
@@ -44,6 +45,6 @@ const ChatFlowManager = new (class ChatFlowManager {
 	sendMessage(chatId, message) {
 		this.bot.sendMessage(chatId, message);
 	}
-})();
+}
 
 module.exports = { ChatFlowManager };
