@@ -20,12 +20,17 @@ class ChatFlowManager {
 			const chatId = msg.chat.id;
 			const text = msg.text.split(`@${AppConfig.zaloBotName} `)[1];
 			if (text && text.trim().length > 1) {
+				console.log('From bot', text);
 				this.client.models
 					.generateContent({
 						model: 'gemini-2.5-flash',
 						contents: text,
+						config: {
+							maxOutputTokens: 1000,
+						},
 					})
 					.then((resp) => {
+						console.log('From AI', resp.text);
 						this.bot.sendMessage(chatId, resp.text);
 					})
 					.catch((err) => {
