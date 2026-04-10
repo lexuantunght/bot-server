@@ -14,6 +14,10 @@ const AppConfig = new (class AppConfig {
 	get zaloBotApiKey() {
 		return process.env.ZALO_BOT_API_KEY || '';
 	}
+
+	get openAIApiKey() {
+		return process.env.OPENAI_API_KEY;
+	}
 })();
 
 module.exports = AppConfig;

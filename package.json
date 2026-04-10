@@ -19,7 +19,8 @@
 		"dotenv": "^16.3.1",
 		"express": "^4.18.1",
 		"express-async-errors": "^3.1.1",
-		"node-zalo-bot": "^0.1.6"
+		"node-zalo-bot": "^0.1.6",
+		"openai": "^6.34.0"
 	},
 	"devDependencies": {
 		"mp-pack-cli": "^1.6.0"
