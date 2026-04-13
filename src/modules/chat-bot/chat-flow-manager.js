@@ -34,11 +34,10 @@ class ChatFlowManager {
 						},
 					})
 					.then((resp) => {
-						console.log('From AI', resp.text);
-						this.bot.sendMessage(chatId, resp.text);
+						this.sendMessage(chatId, resp.text);
 					})
 					.catch((err) => {
-						this.bot.sendMessage(
+						this.sendMessage(
 							chatId,
 							`Chào bạn ${msg.from.display_name}, đã có lỗi xảy ra với bot :((\n${JSON.stringify(err)}`
 						);
@@ -52,7 +51,21 @@ class ChatFlowManager {
 	}
 
 	sendMessage(chatId, message) {
-		this.bot.sendMessage(chatId, message);
+		if (message.length <= 1500) {
+			this.bot.sendMessage(chatId, message);
+		} else {
+			let end = 1500;
+			for (let i = 1499; i >= 0; i--) {
+				if (message[i] === '.') {
+					end = i + 1;
+					break;
+				}
+			}
+			const text = message.substring(0, end);
+			const remain = message.substring(end);
+			this.bot.sendMessage(chatId, text);
+			this.sendMessage(chatId, remain);
+		}
 	}
 }
 
