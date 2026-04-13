@@ -26,7 +26,11 @@ class ChatFlowManager {
 						model: 'gemini-2.5-flash',
 						contents: text,
 						config: {
-							maxOutputTokens: 1000,
+							httpOptions: {
+								retryOptions: {
+									attempts: 3,
+								},
+							},
 						},
 					})
 					.then((resp) => {
