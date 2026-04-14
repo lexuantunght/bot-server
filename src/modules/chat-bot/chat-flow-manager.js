@@ -76,21 +76,28 @@ class ChatFlowManager {
 	}
 
 	sendMessage(chatId, message) {
-		if (message.length <= 1500) {
-			this.bot.sendMessage(chatId, message);
-		} else {
-			let end = 1500;
-			for (let i = 1499; i >= 0; i--) {
-				if (message[i] === '.') {
-					end = i + 1;
-					break;
+		return new Promise((resolve, reject) => {
+			if (message.length <= 0) {
+				reject('Message too short');
+			} else if (message.length <= 1500) {
+				this.bot.sendMessage(chatId, message);
+				resolve();
+			} else {
+				let end = 1500;
+				for (let i = 1499; i >= 0; i--) {
+					if (message[i] === '.') {
+						end = i + 1;
+						break;
+					}
 				}
+				const text = message.substring(0, end);
+				const remain = message.substring(end);
+				this.bot.sendMessage(chatId, text);
+				setTimeout(() => {
+					this.sendMessage(chatId, remain).then(resolve).catch(reject);
+				}, 500);
 			}
-			const text = message.substring(0, end);
-			const remain = message.substring(end);
-			this.bot.sendMessage(chatId, text);
-			this.sendMessage(chatId, remain);
-		}
+		});
 	}
 }
 
