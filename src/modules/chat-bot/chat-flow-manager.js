@@ -13,17 +13,24 @@ class ChatFlowManager {
 	constructor() {
 		this.bot = createBot(AppConfig.zaloBotToken);
 		this.client = new GoogleGenAI({ apiKey: AppConfig.aiApiKey });
+		this.queue = [];
+		this.isProcessing = false;
 	}
 
-	start() {
-		this.bot.on('message', (msg) => {
+	_processMessageIfNeeded() {
+		if (this.isProcessing) {
+			return;
+		}
+		const msg = this.queue.shift();
+		if (msg) {
+			this.isProcessing = true;
 			const chatId = msg.chat.id;
 			const text = msg.text.split(`@${AppConfig.zaloBotName} `)[1];
 			if (text && text.trim().length > 1) {
 				console.log('From bot', text);
 				this.client.models
 					.generateContent({
-						model: 'gemini-2.5-flash',
+						model: 'gemini-2.5-flash-lite',
 						contents: text,
 						config: {
 							httpOptions: {
@@ -41,8 +48,26 @@ class ChatFlowManager {
 							chatId,
 							`Chào bạn ${msg.from.display_name}, đã có lỗi xảy ra với bot :((\n${JSON.stringify(err)}`
 						);
+					})
+					.finally(() => {
+						setTimeout(() => {
+							this.isProcessing = false;
+							this._processMessageIfNeeded();
+						}, 3000);
 					});
+			} else {
+				this.isProcessing = false;
+				this._processMessageIfNeeded();
 			}
+		} else {
+			this.isProcessing = false;
+		}
+	}
+
+	start() {
+		this.bot.on('message', (msg) => {
+			this.queue.push(msg);
+			this._processMessageIfNeeded();
 		});
 	}
 
