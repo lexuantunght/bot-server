@@ -40,15 +40,13 @@ class ChatFlowManager {
 							},
 						},
 					})
-					.then((resp) => {
-						this.sendMessage(chatId, resp.text);
-					})
-					.catch((err) => {
+					.then((resp) => this.sendMessage(chatId, resp.text))
+					.catch((err) =>
 						this.sendMessage(
 							chatId,
 							`Chào bạn ${msg.from.display_name}, đã có lỗi xảy ra với bot :((\n${JSON.stringify(err)}`
-						);
-					})
+						)
+					)
 					.finally(() => {
 						setTimeout(() => {
 							this.isProcessing = false;
@@ -76,10 +74,8 @@ class ChatFlowManager {
 	}
 
 	sendMessage(chatId, message) {
-		return new Promise((resolve, reject) => {
-			if (message.length <= 0) {
-				reject('Message too short');
-			} else if (message.length <= 1500) {
+		return new Promise((resolve) => {
+			if (message.length <= 1500) {
 				this.bot.sendMessage(chatId, message);
 				resolve();
 			} else {
@@ -94,7 +90,7 @@ class ChatFlowManager {
 				const remain = message.substring(end);
 				this.bot.sendMessage(chatId, text);
 				setTimeout(() => {
-					this.sendMessage(chatId, remain).then(resolve).catch(reject);
+					this.sendMessage(chatId, remain).then(resolve);
 				}, 500);
 			}
 		});
