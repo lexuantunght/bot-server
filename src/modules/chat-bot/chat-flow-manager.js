@@ -30,7 +30,7 @@ class ChatFlowManager {
 				console.log('From bot', text);
 				this.client.models
 					.generateContent({
-						model: 'gemini-2.5-flash-lite',
+						model: 'gemini-3.1-flash-lite',
 						contents: text,
 						config: {
 							httpOptions: {
@@ -60,6 +60,23 @@ class ChatFlowManager {
 		} else {
 			this.isProcessing = false;
 		}
+	}
+
+	_test(msg) {
+		this.client.models
+			.generateContent({
+				model: 'gemini-3.1-flash-lite',
+				contents: msg,
+				config: {
+					httpOptions: {
+						retryOptions: {
+							attempts: 3,
+						},
+					},
+				},
+			})
+			.then((resp) => console.log(resp.text))
+			.catch(console.error);
 	}
 
 	start() {
